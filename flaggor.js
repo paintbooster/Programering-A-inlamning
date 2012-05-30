@@ -1,18 +1,105 @@
 var draw = startCanvas("maincanvas");
 
-draw.fillRect(100, 50, 200, 100, "blue");
-draw.fillRect(160, 50, 25, 100, "yellow");
-draw.fillRect(100, 87.5, 200, 25, "yellow");
+// Styr flaggorna med variabler
+// Bredd - höjd
+// Övre vänster hörn som utgångspunkt
+// placering av "korsrutor"
+
+var f_width = 200, f_height = 100;
+var xspace = 326;
+
+var flags = [
+   {
+       x : 100,
+       y : 50,
+       bg: "blue",
+       fg: "yellow"
+   },
+   {
+       x : 100 + xspace,
+       y : 50,
+       bg: "red",
+       fg: "white"
+   },
+   {
+       x : 100 + xspace * 2,
+       y : 50,
+       bg: "white",
+       fg: "blue"
+   }
+];
+
+function drawFlag(x, y, bg_color, x_color) {
+    draw.fillRect(x, y, f_width, f_height, bg_color);
+    // Räkna ut korsets placering och bredd
+    var middle = y + f_height/2;
+    var bar_width = f_height/4;
+    draw.fillRect(x + f_width * 0.3, y, bar_width, f_height, x_color);
+    draw.fillRect(x, middle - bar_width/2, f_width, bar_width, x_color);
+}
+for ( var i = 0, antal = flags.length; i < antal; i += 1 ) {
+   drawFlag(flags[i].x, flags[i].y, flags[i].bg, flags[i].fg);
+}
+// Gör om till loop
+// Flaggstänger - hur ser matematiken ut relativt flaggan?
+
+for ( var i = 0, antal = flags.length; i < antal; i +=1) {
+   draw.fillRect(flags[i].x - 25, 40, flags[i].y - 25, 420, "white");
+   draw.circle  (flags[i].x - 13, 30, flags[i].y - 30, "gold");
+}
+
+// Går flaggan upp eller ner - 1 = ner, -1 = upp
+var flag1_dir = -2;
+
+// Händelsen musklick (1)
+
+draw.canvas().onclick = function (evt) {
+    console.log("x: " + evt.pageX + "| y: " + evt.pageY);
+    var realX = evt.pageX - draw.canvasX();
+    var realY = evt.pageY - draw.canvasY();
+    for ( var i = 0, antal = flags.length; i < antal; i += 1 ) {
+        if ( flags[i].x <= realX &&
+             flags[i].x + f_width >= realX &&
+             flags[i].y <= realY &&
+             flags[i].y + f_height >= realY
+           ) {
+            console.log("hit");
+            flag1_dir = -flag1_dir;
+            if (!moveFlag.isMoving) {
+                moveFlag.isMoving = true;
+                moveFlag(i);
+            }
+        }
+    }
+}
+
+function moveFlag(which) {
+    console.log("which: " + which);
+    // Radera flaggans gamla läge
+    draw.raw().clearRect(flags[which].x, flags[which].y, f_width, f_height);
+    flags[which].y += flag1_dir;
+    // stanna flaggan
+    if ( flags[which].y < 50 ) {
+        flags[which].y = 50;
+        moveFlag.isMoving = false;
+    }
+    if ( flags[which].y > 350 ) {
+    console.log(flags[which].y);
+        flags[which].y = 350;
+        moveFlag.isMoving = false;
+    }
+    drawFlag(flags[which].x, flags[which].y, flags[which].bg, flags[which].fg);
+    // Test om den inte är i botten
+    if (moveFlag.isMoving) {
+        setTimeout(moveFlag, 40, which);
+    }
+}
+moveFlag.isMoving = false;
 
 
-draw.fillRect(400, 50, 200, 100, "red");
-draw.fillRect(460, 50, 25, 100, "white");
-draw.fillRect(400, 87.5, 200, 25, "white");
+
+// flagga (2)
 
 
-draw.fillRect(750, 50, 200, 100, "white");
-draw.fillRect(810, 50, 25, 100, "blue");
-draw.fillRect(750, 87.5, 200, 25, "blue");
 
-draw.fillRect(75, 40, 25, 410, "white");
-draw.circle(87, 30, 20, "gold");
+
