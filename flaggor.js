@@ -5,6 +5,11 @@ var draw = startCanvas("maincanvas");
 // Övre vänster hörn som utgångspunkt
 // placering av "korsrutor"
 
+// Lägg till en "isMoving" egenskap för varje flagga
+// Lägg till en "direction" egenskap för varje flagga
+// Testa att det inte blir error i konsollen
+// Pusha till github
+
 var f_width = 200, f_height = 100;
 var xspace = 326;
 
@@ -13,19 +18,33 @@ var flags = [
        x : 100,
        y : 50,
        bg: "blue",
-       fg: "yellow"
+       fg: "yellow",
+       dir: -2,
+       isMoving : false
    },
    {
        x : 100 + xspace,
        y : 50,
        bg: "red",
-       fg: "white"
+       fg: "white",
+       dir: -2,
+       isMoving : false
    },
    {
        x : 100 + xspace * 2,
        y : 50,
        bg: "white",
-       fg: "blue"
+       fg: "blue",
+       dir: -2,
+       isMoving : false
+       /*
+           console.log("hit");
+            flag1_dir = -flag1_dir;
+            if (!moveFlag.isMoving) {
+                moveFlag.isMoving = true;
+                moveFlag(2);
+            }
+       */
    }
 ];
 
@@ -64,9 +83,9 @@ draw.canvas().onclick = function (evt) {
              flags[i].y + f_height >= realY
            ) {
             console.log("hit");
-            flag1_dir = -flag1_dir;
-            if (!moveFlag.isMoving) {
-                moveFlag.isMoving = true;
+            flags[i].dir = -flags[i].dir;
+            if (!flags[i].isMoving) {
+                flags[i].isMoving = true;
                 moveFlag(i);
             }
         }
@@ -77,25 +96,23 @@ function moveFlag(which) {
     console.log("which: " + which);
     // Radera flaggans gamla läge
     draw.raw().clearRect(flags[which].x, flags[which].y, f_width, f_height);
-    flags[which].y += flag1_dir;
+    flags[which].y += flags[which].dir;
     // stanna flaggan
     if ( flags[which].y < 50 ) {
         flags[which].y = 50;
-        moveFlag.isMoving = false;
+        flags[which].isMoving = false;
     }
     if ( flags[which].y > 350 ) {
-    console.log(flags[which].y);
+        console.log(flags[which].y);
         flags[which].y = 350;
-        moveFlag.isMoving = false;
+        flags[which].isMoving = false;
     }
     drawFlag(flags[which].x, flags[which].y, flags[which].bg, flags[which].fg);
     // Test om den inte är i botten
-    if (moveFlag.isMoving) {
+    if (flags[which].isMoving) {
         setTimeout(moveFlag, 40, which);
     }
 }
-moveFlag.isMoving = false;
-
 
 
 // flagga (2)
